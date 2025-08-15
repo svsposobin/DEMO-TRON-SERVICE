@@ -29,12 +29,26 @@ python src/main.py
 ### ⚠️ Necessarily ⚠️:
 
 > **Set your tron data provider API-KEY in .env.test**
-> 
+>
 > **Example: # .env.test: BASE_TRON_KEY=QWERTY12356...**
-> 
+>
 > **It is generally recommended to use TronGrid**
-> 
+>
 > **But you can also use another provider or multiple providers by slightly changing the implementation**
+
+---
+
+> **Don't forget to check your database connection attributes to PostgreSQL in .env.test:**
+>
+> **POSTGRES_HOST=localhost**
+>
+> **POSTGRES_PORT=5432**
+>
+> **POSTGRES_USER=postgres**
+>
+> **POSTGRES_PASSWORD=postgres**
+>
+> **POSGTRES_DATABASE=postgres**
 
 #### Defined routes (URLs):
 
