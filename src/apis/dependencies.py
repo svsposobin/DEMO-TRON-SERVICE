@@ -21,20 +21,20 @@ async def write_wallet_info(
             address=address,
         )
 
-        async with session.begin():
-            new_record: RequestedWallets = RequestedWallets(
-                address=address,
-                balance=tron_account_response.balance,
-                bandwidth=tron_account_response.bandwidth,
-                energy=tron_account_response.energy,
-
-            )
-            session.add(new_record)
+        new_record: RequestedWallets = RequestedWallets(
+            address=address,
+            balance=tron_account_response.balance,
+            bandwidth=tron_account_response.bandwidth,
+            energy=tron_account_response.energy,
+        )
+        session.add(new_record)
+        await session.commit()
 
         result.address = address
         result.saved = True
 
     except Exception as error:
+        await session.rollback()
         result.error = str(error)  # Можно реализовать маппинг ошибок
 
     return result
@@ -56,22 +56,21 @@ async def get_wallet_info(
         limit: int = RECORDS_PER_PAGE
         offset: int = (page - 1) * limit
 
-        async with session.begin():
-            records_per_pagination = await session.scalars(
-                select(RequestedWallets).offset(offset).limit(limit)
+        records_per_pagination = await session.scalars(
+            select(RequestedWallets).offset(offset).limit(limit)
+        )
+        for record in records_per_pagination.all():
+            result.info.append(
+                TronDataResponse(
+                    address=record.address,
+                    balance=record.balance,
+                    bandwidth=record.bandwidth,
+                    energy=record.energy,
+                )
             )
 
-            for record in records_per_pagination.all():
-                result.info.append(
-                    TronDataResponse(
-                        address=record.address,
-                        balance=record.balance,
-                        bandwidth=record.bandwidth,
-                        energy=record.energy,
-                    )
-                )
-
     except Exception as error:
+        await session.rollback()
         result.error = str(error)
 
     return result
